@@ -1,0 +1,157 @@
+CREATE TABLE users (
+  	email VARCHAR(50) NOT NULL,
+  	name VARCHAR(50) NOT NULL,
+  	password VARCHAR(20) NOT NULL,
+  	number INT NOT NULL auto_increment,
+	PRIMARY KEY (number)
+);
+
+CREATE TABLE course (
+	ID INT NOT NULL auto_increment,
+	name VARCHAR(50) NOT NULL,
+	description text NOT NULL,
+	enrollmentkey varchar(10),
+	free_places INT NOT NULL CHECK (free_places between 0 AND 100),
+	creator INT NOT NULL,
+	PRIMARY KEY (ID),
+	FOREIGN KEY (creator) REFERENCES users(number)
+);
+
+CREATE TABLE enroll (
+	user INT NOT NULL,
+	course INT NOT NULL,
+	date_of_entry TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  	PRIMARY KEY (user, course),
+  	FOREIGN KEY (user) REFERENCES users(number),
+  	FOREIGN KEY (course) REFERENCES course(ID) on delete cascade
+);
+
+CREATE TABLE submission (
+	id INT NOT NULL auto_increment,
+	submission_text text NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE tasks (
+	number INT NOT NULL auto_increment,
+	name VARCHAR(50) NOT NULL,
+	description text NOT NULL,
+	nr INT NOT NULL,
+	primary key(number,nr),
+	foreign key(nr)references course (ID) on delete cascade
+);
+CREATE TABLE submit(
+	sid INT NOT NULL,
+	cid INT NOT NULL,
+	tid INT NOT NULL,
+	user INT NOT NULL,
+	PRIMARY KEY (sid, cid, tid , user),
+	FOREIGN KEY (sid) REFERENCES submission(id) on delete cascade,
+	foreign key(cid, tid)references tasks (nr, number) on delete cascade,
+	FOREIGN KEY (user) REFERENCES users(number)
+);
+
+
+
+CREATE TABLE canRate (
+	grade INT CHECK(grade BETWEEN 1 AND 5),
+	comment VARCHAR(100),
+	submission INT NOT NULL,
+	user INT NOT NULL,
+	PRIMARY KEY(submission, user),
+	FOREIGN KEY(submission) REFERENCES submission(id),
+	FOREIGN KEY(user) REFERENCES users(number)
+);
+
+CREATE TRIGGER enroll_user
+AFTER INSERT ON course
+FOR EACH ROW
+INSERT INTO enroll VALUES(new.creator, new.id, CURRENT_TIMESTAMP);
+
+create view course_detail as
+select course.ID as ID, course.name as cname, users.name as uname, course.description as cdescription, course.free_places as free_places from course join users on course.creator = users.number;
+
+create view view_course as
+select c.ID, c.name, c.description, c.enrollmentkey, c.free_places, e.user, u.name as uname from course c join enroll e on c.ID = e.course join users u where c.creator=u.number;
+
+create view submit_task as
+select t.number, t.name, t.description, c.name cname, t.nr from tasks t join course c on t.nr = c.ID;
+
+create view avgGrade as
+select avg(grade) as avgGrade, comment, submission, user from canrate group by submission;
+
+create view searchedCourse as
+SELECT ID, c.name as cname, c.description, c.free_places, u.name as uname FROM course as c join users as u on c.creator=u.number;
+
+INSERT INTO users (email, name, password) VALUES
+	('dummy@dummy.com', 'DummyUser', 'dummy'),
+	('alan@turing.com', 'Alan Turing', 'alan'),
+	('donald@eKnuth.com', 'DonaldEKnuth', 'donald'),
+	('tim@bernersLee.com', 'Tim Berners Lee', 'tim'),
+	('fuhr@fuhr.com', 'Nobert Fuhr', 'fuhr'),
+	('aker@aker.com', 'Ahmet Aker', 'aker')
+;
+
+INSERT INTO course (name, description, enrollmentkey, free_places, creator)  VALUES
+	('Datenbanken', 'Einfuehrung in relationale Datenbanken', 'db2', 50, 5),
+	('Information Mining', 'Data Mining Basics', 'im', 30, 6),
+	('Information Retrieval', 'IR Basics', 'ir', 20, 5),
+	('Information Engineering', 'Daten vs Information vs Wissen', NULL, 60, 4),
+	('Deep Learning 101', 'Learn the new AI technologies', NULL, 80, 3),
+	('Arts', 'History about Arts', 'arts', 10, 2),
+	('Social Sciences', 'Social Sciences for Beginners', NULL, 2, 1)
+;
+
+INSERT INTO tasks (name, description, nr)  VALUES
+	('ER-Modellierung', 'Was ist Unterschied zwischen Entität und Relation?', 1),
+	('Relationale Algebra', 'Was ist Unterschied zwischen Projetion und Selektion?', 1),
+	('SQL', 'Wofür steht SQL?', 1),
+	('ACID', 'Was bedeut Atomicity?', 1),
+	('Naive Bayes', 'Was ist naive Annahme in Naive Bayes?', 2),
+	('SVM', 'Ist SVM ein linearer Klassifikator?', 2),
+	('TF-IDF', 'Was macht IDF?', 3),
+	('K-Means', 'Wie wählt man K aus?', 3)
+;
+
+INSERT INTO enroll (user, course) VALUES
+	(6, 1),
+	(6, 3),
+	(6, 4),
+	(1, 2),
+	(1, 3),
+	(2, 1),
+	(2, 2)
+;
+
+INSERT INTO submission (submission_text)  VALUES
+	('Relation beschreibt Beziehungen zwischen Entitäten'),
+	('Projektion wählt Spalten aus und Selektion wählt Zeilen aus'),
+	('Structured Query Language'),
+	('Inverse Dokument Häufigkeit von einem Wort'),
+	('Am besten mit der Elbow-Methode..'),
+	('Irgendwas mit Inverse, oder?'),
+	('Trial and Error :)')
+;
+
+INSERT INTO submit (sid, cid, tid, user)  VALUES
+	(1, 1, 1, 6),
+	(2, 1, 2, 6),
+	(3, 1, 3, 6),
+	(4, 3, 7, 6),
+	(5, 3, 8, 6),
+	(6, 3, 7, 1),
+	(7, 3, 8, 1)
+;
+
+INSERT INTO canRate (grade, comment, submission, user) VALUES
+	(2, 'Und was ist eine Entität?', 1, 5),
+	(1, 'Richtig!', 2, 5),
+	(1, 'Richtig!', 3, 5),
+	(2, 'Stimmt', 4, 5),
+	(3, 'Ja, aber wie genau?', 5, 5),
+	(5, 'Falsch', 6, 5),
+	(4, 'Naja :)', 7, 5),
+	(1, 'Super', 1, 2),
+	(1, 'Korrekt!', 2, 2),
+	(1, 'Bravo!', 3, 2)
+;
