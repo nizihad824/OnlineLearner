@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('new_course') }}">Create Course</a>
+        <a href="{{ url_for('view_course') }}">View Courses</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    <div>
+        Kurs: {{ obj[0][3] }} <br>
+        Task: {{ obj[0][1] }} <br>
+        Description: {{ obj[0][2] }} <br>
+        <form action="" method="POST">
+            Submit Text<input type="text" name="txt">
+            <input type="submit" value="submit">
+        </form>
+    </div>
+{% endblock %}

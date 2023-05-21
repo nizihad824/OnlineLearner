@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('new_course') }}">Create Course</a>
+        <a href="{{ url_for('view_course') }}">View Courses</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    <div>
+        <h1>Information</h1>
+        <p>{{ value[0][1] }}</p>
+        <p>Creator: {{ value[0][2] }}</p>
+        <p>{{ value[0][3] }}</p>
+        <p>No of free places: {{ value[0][4] }}</p>
+    </div>
+
+
+    {% if value[0][0] in idInfos %}
+        <a href="{{ url_for('delete', cid=value[0][0])}}"><input type="submit" value="delete"></a>
+        <a href="{{ url_for('new_task', cid=value[0][0])}}"><input type="submit" value="create task"></a>
+    {% endif %}
+
+    {% if value[0][0] not in infos %}
+        <a href="{{ url_for('new_enroll', cid=value[0][0])}}"><input type="submit" value="enroll"></a>
+    {% else %}
+        <a href="{{ url_for('assess', cid=value[0][0])}}"><input type="submit" value="rate"></a>
+        <div>
+            <p><h1>List of the tasks</h1></p>
+            <p>Tasks       My Submissions       Grade</p>
+            {% for st in stInfo %}
+                {% if st[3] and st[6] %}
+                    <p><a href="{{ url_for('new_assignment', tid=st[0]) }}">{{ st[1] }}</a>    {{ st[3] }}       {{ st[6] }}</p>
+                {% elif st[3] and st[6]==None %}
+                    <p><a href="{{ url_for('new_assignment', tid=st[0]) }}">{{ st[1] }}</a>       {{ st[3] }}       Not Graded</p>
+                {% else %}
+                    <p><a href="{{ url_for('new_assignment', tid=st[0]) }}">{{ st[1] }}</a>       No Submission       Not Graded</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

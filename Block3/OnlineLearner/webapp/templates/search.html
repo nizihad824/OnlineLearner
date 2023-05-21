@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('new_course') }}">Create Course</a>
+        <a href="{{ url_for('view_course') }}">View Courses</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    {% if nameobj %}
+        <p><h1>Searched Courses</h1></p>
+        {% for obj in nameobj %}
+           <p>ID: {{ obj[0] }}</p>
+           <p>Name: <a href="{{ url_for('view_course_detail', cid=obj[0]) }}">{{ obj[1] }}</a></p>
+           <p>Description: {{ obj[2] }}</p>
+           <p>Free Places: {{ obj[3] }}</p>
+           <p>Creator: {{ obj[4] }}</p>
+        {% endfor %}
+    {% else %}
+        <!-- if no courses found or invalid entry then we show nothing and go back button to go prevoius page -->
+        <script>
+        function goBack()
+          {
+          window.history.back()
+          }
+        </script>
+
+        <body>
+        <p><h3>No courses found!!!</h3></p>
+        <button onclick="goBack()">Go Back</button>
+        </body>
+    {% endif %}
+
+{% endblock %}

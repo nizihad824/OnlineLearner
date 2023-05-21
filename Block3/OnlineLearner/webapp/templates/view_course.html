@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('new_course') }}">Create Course</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+
+{% endblock %}
+{% block content %}
+    <p><h1>My Courses</h1></p>
+   {% for val in value %}
+       <p>ID: {{ val[0] }}</p>
+       <p>Name: <a href="{{ url_for('view_course_detail', cid=val[0]) }}">{{ val[1] }}</a></p>
+       <p>Description: {{ val[2] }}</p>
+       <p>Free Places: {{ val[4] }}</p>
+       <p>Creator: {{ val[6] }}</p>
+    {% endfor %}
+
+    <p><h1>Available Courses</h1></p>
+    {% if values %}
+        {% for vals in values %}
+       <p>ID: {{ vals[0] }}</p>
+       <p>Name: <a href="{{ url_for('view_course_detail', cid=vals[0]) }}">{{ vals[1] }}</a></p>
+       <p>Description: {{ vals[2] }}</p>
+       <p>Free Places: {{ vals[4] }}</p>
+       <p>Creator: {{ vals[5] }}</p>
+        {% endfor %}
+    {% else %}
+        <p>No available courses right now</p>
+    {% endif %}
+
+{% endblock %}

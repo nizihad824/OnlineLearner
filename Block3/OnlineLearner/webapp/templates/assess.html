@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('new_course') }}">Create Course</a>
+        <a href="{{ url_for('view_course') }}">View Courses</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    <div>
+        <p>Task: {{ objRandom[2] }}</p><br>
+        <p>Description: {{ objRandom[3] }}</p><br>
+        <p>Submission Text: {{ objRandom[4] }}</p><br>
+        <form method="post" action="">
+            <p>Assessment Grade:</p>
+            <input id=1 type="radio" name="gd" value="1">
+            <label for=1>1</label>
+
+            <input id="2" type="radio" name="gd" value="2">
+            <label for="2">2</label>
+
+            <input id="3" type="radio" name="gd" value="3">
+            <label for="3">3</label>
+
+            <input id="4" type="radio" name="gd" value="4">
+            <label for="4">4</label>
+
+            <input id="5" type="radio" name="gd" value="5">
+            <label for="5">5</label>
+
+            <p>Comment:</p>
+            <textarea name="cmt" rows="8" cols="80"></textarea>
+
+            <input type="hidden" name="sb" value="{{ objRandom[1] }}">
+
+            <input type="submit" value="rate">
+        </form>
+    </div>
+{% endblock %}

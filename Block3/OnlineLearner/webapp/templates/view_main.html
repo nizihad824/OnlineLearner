@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}
+{% endblock %}
+{% block content %}
+    <div>
+        <p><h1>Log In</h1></p>
+        <form method="POST" action={{ url_for("login") }}>
+            Email: <input type="email" name="eml">
+            Password: <input type="password" name="psl">
+            <input type="submit" value="login">
+        </form>
+    </div>
+
+    <div>
+        <p><h1>Register</h1></p>
+        <form method="POST" action={{ url_for("register") }}>
+            Name: <input type="text" name="nm">
+            Email: <input type="email" name="em">
+            Password: <input type="password" name="ps">
+            <input type="submit" value="register">
+        </form>
+    </div>
+{% endblock %}

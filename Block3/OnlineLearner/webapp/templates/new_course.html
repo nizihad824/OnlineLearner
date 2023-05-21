@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}
+    <div>
+        <a href="{{ url_for('view_course') }}">View Courses</a>
+        {% if "user" in session %}
+            <a href="{{ url_for('logout') }}">Log Out</a>
+        {% endif %}
+    </div>
+    <div>
+        <form method="POST" action={{ url_for("search") }}>
+            <input type="search" name="srch" list="searched">
+            <input type="submit" value="Search">
+            <datalist id="searched">
+                {% for name in nameData %}
+                    <option value="{{ name[0] }}">
+                {% endfor %}
+            </datalist>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    <div>
+        <form method="POST" action="">
+            Name <input type="text" name="nm"><br>
+            Enroll Key <input type="text" name="ek"><br>
+            No of free places <input type="number" name="fp"><br>
+            <p>Description</p>
+            <textarea name="des" rows="8" cols="80"></textarea><br>
+            <input type="submit" value="create">
+        </form>
+    </div>
+{% endblock %}
